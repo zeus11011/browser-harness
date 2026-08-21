@@ -8,7 +8,15 @@ from langchain_core.language_models.chat_models import BaseChatModel
 load_dotenv(find_dotenv(usecwd=True))
 
 # provider -> (startswith prefixes, contains keywords, api-key env vars in priority order)
+# Bedrock goes first: its IDs (e.g. "us.anthropic.claude-...") would otherwise match "anthropic".
+# Bedrock has no API-key env var: auth uses the AWS credential chain (AWS_PROFILE, AWS_ACCESS_KEY_ID,
+# AWS_BEARER_TOKEN_BEDROCK, ...) and AWS_REGION / AWS_DEFAULT_REGION, read by langchain-aws/boto3.
 _PROVIDERS: dict[str, tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...]]] = {
+    "bedrock_converse": (
+        ("us.", "eu.", "apac.", "global.", "anthropic.", "amazon.", "meta.", "mistral.", "cohere.", "ai21.", "deepseek.", "qwen.", "openai."),
+        ("bedrock",),
+        (),
+    ),
     "google_genai": (("gemini",), ("google",), ("GEMINI_API_KEY", "GOOGLE_API_KEY")),
     "anthropic": (("claude",), ("anthropic",), ("ANTHROPIC_API_KEY",)),
     "openai": (("gpt", "o1", "o3"), ("openai",), ("OPENAI_API_KEY",)),
@@ -39,8 +47,8 @@ def _infer_provider(
         )
         return provider, model
 
-    if ":" in model_name:
-        provider, model = model_name.split(":", 1)
+    provider, sep, model = model_name.partition(":")
+    if sep and "." not in provider:  # Bedrock IDs like "amazon.nova-pro-v1:0" aren't provider:model
         return provider.lower().strip(), model
 
     lower = model_name.lower().strip()
@@ -58,6 +66,8 @@ def _get_api_key_for_provider(
 ) -> Optional[str]:
     if explicit_api_key:
         return explicit_api_key
+    if provider in ("bedrock_converse", "bedrock"):
+        return None  # AWS credential chain, not an API key
     for env_var in _PROVIDERS.get(provider, ((), (), ()))[2]:
         if key := os.getenv(env_var):
             return key
@@ -95,6 +105,7 @@ def load_llm_config(
 
 
 _PROVIDER_LABELS: dict[str, str] = {
+    "bedrock_converse": "AWS Bedrock",
     "google_genai": "Gemini/Google",
     "anthropic": "Anthropic",
     "openai": "OpenAI",

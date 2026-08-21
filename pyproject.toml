@@ -1,12 +1,14 @@
 [project]
 name = "browser-harness"
 version = "0.1.0"
-description = "Add your description here"
+description = "A LangGraph agent that drives Chrome through the browser_ops MCP server in a plan/execute/verify loop."
 readme = "README.md"
+license = { file = "LICENSE" }
 requires-python = ">=3.13"
 dependencies = [
     "deepagents>=0.7.8",
     "fastmcp>=3.4.7",
+    "langchain-aws>=1.8.1",
     "langchain-mcp-adapters>=0.3.2",
     "langchain-openai>=1.6.0",
     "selenium>=4.47.0",

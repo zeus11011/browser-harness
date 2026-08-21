@@ -16,7 +16,6 @@ This project uses `uv` for dependency management (Python >= 3.13).
 
 - Install dependencies: `uv sync`
 - Run the agent entry point: `uv run main.py`
-- Run the raw MCP client probe (lists tools/resources/prompts from the server): `uv run client.py`
 - Add a dependency: `uv add <package>`
 
 There is no configured lint/test/build tooling in `pyproject.toml` yet — check with the user before assuming a specific test runner.
@@ -32,7 +31,6 @@ There is no configured lint/test/build tooling in `pyproject.toml` yet — check
   - `routing.py` — conditional-edge logic and the retry/replan loop guards.
   - `prompts.py` — `load_skill()` / `system_prompt()`, which compose each node's system prompt from `skills/browser/*/SKILL.md`.
   - `mcp_tools.py` — `get_browser_ops_tools()`, the `MultiServerMCPClient` connection to `mcp_servers/server.py`.
-- `client.py` — a standalone FastMCP `Client` script for manually probing the `browser_ops` MCP server (tools/resources/prompts) over stdio, independent of the agent.
 - `mcp_servers/` — the `browser_ops` MCP server implementation (Selenium session management, command dispatch, models). Treat this as an existing, self-contained subsystem — do not modify it.
 - `skills/browser/` — skill definitions consumed by agents at runtime, not Python code. One skill per node, plus the shared tool surface; every node's prompt is `browser-ops` + its own skill:
   - `browser-ops/SKILL.md` — the single source of truth for the `browser_ops` MCP tool surface (navigation, click/type, waits, verifications, session management) and locator model (`{by, value}` with strategies `css`, `xpath`, `id`, `name`, `class_name`, `tag_name`, `link_text`, `partial_link_text`). The other skills reference it rather than restating tool names.
@@ -40,7 +38,7 @@ There is no configured lint/test/build tooling in `pyproject.toml` yet — check
   - `manual-test/SKILL.md` — the executor's skill: runs the test case step by step and reports pass/fail with evidence.
   - `verifier/SKILL.md` — judges one executed step from its tool results and returns `pass` / `retry` / `replan`. Never executes tools.
 - `errors.py` — application-level exception hierarchy (`AppError` and subclasses like `MissingLocatorError`, `ElementNotFoundError`, `CommandExecutionError`) used for structured error messages from browser commands.
-- `utils/` — shared utility helpers (currently empty scaffold).
+- `utils/config.py` — `get_llm()`, the provider-agnostic model resolution described above.
 
 ## Key conventions
 

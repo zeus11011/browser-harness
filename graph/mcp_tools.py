@@ -8,7 +8,6 @@ BROWSER_OPS_SERVER = PROJECT_ROOT / "mcp_servers" / "server.py"
 
 
 async def get_browser_ops_tools():
-    # Same server this project's client.py talks to: mcp_servers/server.py
     client = MultiServerMCPClient(
         {
             "browser_ops": {
