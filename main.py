@@ -1,15 +1,34 @@
+import asyncio
+import sys
 from pathlib import Path
-from mcp_servers.browser_ops.selenium_wrapper.session import SessionManager
-from mcp_servers.browser_ops.server import McpServerApp
-from mcp_servers.browser_ops.models import TestStore
+
+PROJECT_ROOT = Path(__file__).resolve().parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from graph import build_graph
 
 
-def main():
-    session_manager = SessionManager(headless=True)
-    test_store = TestStore(work_dir=Path.cwd())
-    app = McpServerApp(session_manager, test_store)
-    app.mcp.run(transport="streamable-http", host="127.0.0.1", port=8080)
+async def main():
+    agent = await build_graph()
+    # Run the agent
+    response = await agent.ainvoke(
+        {"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+        # plan/execute/verify loops once per step, so the default limit of 25 is low
+        config={"recursion_limit": 100},
+    )
+    print(response)
+    # Print the agent's response
+    messages = response.get("messages", [])
+    if messages:
+        last_message = messages[-1]
+        if hasattr(last_message, "content"):
+            print(last_message.content)
+        else:
+            print(last_message)
+    else:
+        print(response)
 
 
 if __name__ == "__main__":
-    main()
+   asyncio.run(main())

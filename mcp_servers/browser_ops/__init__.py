@@ -1,4 +1,6 @@
 from .server import McpServerApp
+from .selenium_wrapper.session import SessionManager
+from .models.test_store import TestStore
 from .errors import (
     AppError,
     MissingLocatorError,
@@ -9,6 +11,8 @@ from .errors import (
 
 __all__ = [
     "McpServerApp",
+    "SessionManager",
+    "TestStore",
     "AppError",
     "MissingLocatorError",
     "InvalidLocatorError",
