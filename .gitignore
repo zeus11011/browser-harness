@@ -1,4 +1,5 @@
 *.pyc
 .venv
 __pycache__
-.envbrag-output/work/
+.env
+brag-output/work/
