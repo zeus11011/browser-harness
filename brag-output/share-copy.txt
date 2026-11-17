@@ -1,0 +1,3 @@
+Write the UI test like a human: "log in, search headphones, add the first one to cart." browser-harness plans it into atomic steps, runs them one at a time in real Chrome over MCP, and a verifier judges every step (pass, retry, replan) because the executor's word is not evidence.
+
+github.com/zeus11011/browser-harness
