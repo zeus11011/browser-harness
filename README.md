@@ -6,6 +6,8 @@ A LangGraph agent that drives a real Chrome browser through an MCP server.
 WebDriver — and runs a **plan → execute → verify** loop over an LLM to carry out
 browser automation and manual UI test flows written in plain English.
 
+[![browser-harness in 20 seconds](brag-output/brag.jpg)](brag-output/brag.mp4)
+
 ---
 
 ## How it works
